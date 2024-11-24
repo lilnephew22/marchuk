@@ -1,0 +1,35 @@
+Vagrant.configure("2") do |config|
+  # Налаштування VirtualBox як провайдера
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"  # Виділення пам'яті для віртуальної машини
+    vb.cpus = 2         # Кількість процесорів
+    vb.gui = false      # Вимикаємо графічний інтерфейс (можна поставити true для GUI)
+  end
+
+  # Налаштування SSH для доступу до віртуальної машини
+  config.ssh.username = "vagrant"
+  config.ssh.password = "vagrant"
+
+  # Віртуальна машина для Ubuntu
+  config.vm.define "ubuntu" do |ubuntu|
+    ubuntu.vm.box = "ubuntu/focal64"  # Вибір образу Ubuntu (Focal Fossa)
+    
+    # Зміна порту для SSH (якщо порт 2200 вже зайнятий)
+    ubuntu.vm.network "forwarded_port", guest: 7172, host: 7172
+
+    # Прокачка VM за допомогою shell-скриптів
+    ubuntu.vm.provision "shell", inline: <<-SHELL
+      # Завантажуємо і встановлюємо .NET SDK
+      wget https://dot.net/v1/dotnet-install.sh
+      chmod +x dotnet-install.sh
+      ./dotnet-install.sh --install-dir /usr/share/dotnet
+      export PATH=$PATH:/usr/share/dotnet
+
+      # Додавання NuGet джерела для пакетів
+      dotnet nuget add source http://192.168.56.1:5000/v3/index.json --name BaGet --store-password-in-clear-text
+
+      # Встановлення глобального інструменту
+      dotnet tool install --global ILugovoy --version 1.0.0 --add-source http://192.168.56.1:5000/v3/index.json
+    SHELL
+  end
+end

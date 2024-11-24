@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>Ласкаво просимо до додатку</h1>
+
+<p>Цей додаток дозволяє запускати три окремі програми, доступ до яких можливий після авторизації.</p>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <p>Ви увійшли як: @User.Identity.Name</p>
+    <nav>
+        <ul>
+            <li><a asp-controller="Profile" asp-action="Index">Профіль</a></li>
+            <li><a asp-controller="Program" asp-action="RunLab1">Запустити Лабораторну роботу 1</a></li>
+            <li><a asp-controller="Program" asp-action="RunLab2">Запустити Лабораторну роботу 2</a></li>
+            <li><a asp-controller="Program" asp-action="RunLab3">Запустити Лабораторну роботу 3</a></li>
+            <li>
+                <form asp-action="Logout" asp-controller="Account" method="post">
+                    <button type="submit">Вийти</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+}
+else
+{
+    <p>
+        Будь ласка, <a asp-controller="Account" asp-action="Login">Увійдіть</a> або
+        <a asp-controller="Account" asp-action="Register">Зареєструйтесь</a> для доступу до додаткових функцій.
+    </p>
+}
